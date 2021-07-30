@@ -1262,6 +1262,11 @@ contract MasterChef is Ownable, ReentrancyGuard {
     uint256 public riyoPerBlock;
     // Bonus muliplier for early RIYO makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
+    // Max deposit fee: 10%
+    uint16 public constant MAXIMUM_DEPOSIT_FEE = 1000;
+    // Max tax rate for the defitionary tokens: 20%
+    uint16 public constant MAXIMUM_TAX_RATE = 2000;
+
     // Deposit Fee address
     address public feeAddress;
 
@@ -1269,6 +1274,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
     PoolInfo[] public poolInfo;
     // Info of each user that stakes LP tokens.
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
+    // Token addresses that has tax rate
+    mapping(address => uint16) private _taxableTokens;
     // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
     // The block number when RIYO mining starts.
@@ -1313,7 +1320,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
     // Add a new lp to the pool. Can only be called by the owner.
     function add(uint256 _allocPoint, IBEP20 _lpToken, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner nonDuplicated(_lpToken) {
-        require(_depositFeeBP <= 10000, "add: invalid deposit fee basis points");
+        require(_depositFeeBP <= MAXIMUM_DEPOSIT_FEE, "add: invalid deposit fee basis points");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -1331,7 +1338,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
     // Update the given pool's RIYO allocation point and deposit fee. Can only be called by the owner.
     function set(uint256 _pid, uint256 _allocPoint, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner {
-        require(_depositFeeBP <= 10000, "set: invalid deposit fee basis points");
+        require(_depositFeeBP <= MAXIMUM_DEPOSIT_FEE, "set: invalid deposit fee basis points");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -1341,7 +1348,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     }
 
     // Return reward multiplier over the given _from to _to block.
-    function getMultiplier(uint256 _from, uint256 _to) public view returns (uint256) {
+    function getMultiplier(uint256 _from, uint256 _to) public pure returns (uint256) {
         return _to.sub(_from).mul(BONUS_MULTIPLIER);
     }
 
@@ -1420,6 +1427,15 @@ contract MasterChef is Ownable, ReentrancyGuard {
         }
         if (_amount > 0) {
             pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
+
+            // When the token in the liquidity is defitionary token
+            if (tokenTaxRate(address(pool.lpToken)) > 0) {
+                uint256 transferTax = _amount
+                .mul(tokenTaxRate(address(pool.lpToken)))
+                .div(10000);
+                _amount = _amount.sub(transferTax);
+            }
+
             if (pool.depositFeeBP > 0) {
                 uint256 depositFee = _amount.mul(pool.depositFeeBP).div(10000);
                 pool.lpToken.safeTransfer(feeAddress, depositFee);
@@ -1484,6 +1500,25 @@ contract MasterChef is Ownable, ReentrancyGuard {
         require(msg.sender == feeAddress, "setFeeAddress: FORBIDDEN");
         feeAddress = _feeAddress;
         emit SetFeeAddress(msg.sender, _feeAddress);
+    }
+
+    /**
+     * @dev Returns the tax rate of the token address.
+     */
+    function tokenTaxRate(address _address) public view returns (uint16) {
+        return _taxableTokens[_address];
+    }
+
+    /**
+     * @dev Set tax rate of token.
+     * Can only be called by the owner.
+     */
+    function setTokenTaxRate(address _address, uint16 _taxRate)
+        public
+        onlyOwner
+    {
+        require(_taxRate <= MAXIMUM_TAX_RATE, "setTokenTaxRate:: Out of maximum limit");
+        _taxableTokens[_address] = _taxRate;
     }
     
     function updateEmissionRate(uint256 _riyoPerBlock) public onlyOwner {
