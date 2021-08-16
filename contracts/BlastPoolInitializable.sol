@@ -1,10 +1,10 @@
 /**
  *Submitted for verification at BscScan.com on 2021-05-05
- */
+*/
 
 // File: @openzeppelin/contracts/utils/Context.sol
 
-
+// SPDX-License-Identifier: MIT
 
 pragma solidity >=0.6.0 <0.8.0;
 
@@ -48,10 +48,7 @@ pragma solidity >=0.6.0 <0.8.0;
 abstract contract Ownable is Context {
     address private _owner;
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -94,121 +91,10 @@ abstract contract Ownable is Context {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
         emit OwnershipTransferred(_owner, newOwner);
         _owner = newOwner;
     }
-}
-
-// File: bsc-library/contracts/IBEP20.sol
-
-pragma solidity >=0.4.0;
-
-interface IBEP20 {
-    /**
-     * @dev Returns the amount of tokens in existence.
-     */
-    function totalSupply() external view returns (uint256);
-
-    /**
-     * @dev Returns the token decimals.
-     */
-    function decimals() external view returns (uint8);
-
-    /**
-     * @dev Returns the token symbol.
-     */
-    function symbol() external view returns (string memory);
-
-    /**
-     * @dev Returns the token name.
-     */
-    function name() external view returns (string memory);
-
-    /**
-     * @dev Returns the bep token owner.
-     */
-    function getOwner() external view returns (address);
-
-    /**
-     * @dev Returns the amount of tokens owned by `account`.
-     */
-    function balanceOf(address account) external view returns (uint256);
-
-    /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transfer(address recipient, uint256 amount)
-        external
-        returns (bool);
-
-    /**
-     * @dev Returns the remaining number of tokens that `spender` will be
-     * allowed to spend on behalf of `owner` through {transferFrom}. This is
-     * zero by default.
-     *
-     * This value changes when {approve} or {transferFrom} are called.
-     */
-    function allowance(address _owner, address spender)
-        external
-        view
-        returns (uint256);
-
-    /**
-     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * IMPORTANT: Beware that changing an allowance with this method brings the risk
-     * that someone may use both the old and the new allowance by unfortunate
-     * transaction ordering. One possible solution to mitigate this race
-     * condition is to first reduce the spender's allowance to 0 and set the
-     * desired value afterwards:
-     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     *
-     * Emits an {Approval} event.
-     */
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Moves `amount` tokens from `sender` to `recipient` using the
-     * allowance mechanism. `amount` is then deducted from the caller's
-     * allowance.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a {Transfer} event.
-     */
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    /**
-     * @dev Emitted when `value` tokens are moved from one account (`from`) to
-     * another (`to`).
-     *
-     * Note that `value` may be zero.
-     */
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    /**
-     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-     * a call to {approve}. `value` is the new allowance.
-     */
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
 }
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
@@ -234,11 +120,7 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryAdd(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         uint256 c = a + b;
         if (c < a) return (false, 0);
         return (true, c);
@@ -249,11 +131,7 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function trySub(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         if (b > a) return (false, 0);
         return (true, a - b);
     }
@@ -263,11 +141,7 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryMul(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
         // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
@@ -282,11 +156,7 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryDiv(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         if (b == 0) return (false, 0);
         return (true, a / b);
     }
@@ -296,11 +166,7 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryMod(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
         if (b == 0) return (false, 0);
         return (true, a % b);
     }
@@ -521,6 +387,105 @@ abstract contract ReentrancyGuard {
     }
 }
 
+// File: bsc-library/contracts/IBEP20.sol
+
+pragma solidity >=0.4.0;
+
+interface IBEP20 {
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the token decimals.
+     */
+    function decimals() external view returns (uint8);
+
+    /**
+     * @dev Returns the token symbol.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the token name.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the bep token owner.
+     */
+    function getOwner() external view returns (address);
+
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address _owner, address spender) external view returns (uint256);
+
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
 // File: @openzeppelin/contracts/utils/Address.sol
 
 pragma solidity >=0.6.2 <0.8.0;
@@ -576,17 +541,11 @@ library Address {
      * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
      */
     function sendValue(address payable recipient, uint256 amount) internal {
-        require(
-            address(this).balance >= amount,
-            "Address: insufficient balance"
-        );
+        require(address(this).balance >= amount, "Address: insufficient balance");
 
         // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
         (bool success, ) = recipient.call{value: amount}("");
-        require(
-            success,
-            "Address: unable to send value, recipient may have reverted"
-        );
+        require(success, "Address: unable to send value, recipient may have reverted");
     }
 
     /**
@@ -607,10 +566,7 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
         return functionCall(target, data, "Address: low-level call failed");
     }
 
@@ -644,13 +600,7 @@ library Address {
         bytes memory data,
         uint256 value
     ) internal returns (bytes memory) {
-        return
-            functionCallWithValue(
-                target,
-                data,
-                value,
-                "Address: low-level call with value failed"
-            );
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
     }
 
     /**
@@ -665,15 +615,11 @@ library Address {
         uint256 value,
         string memory errorMessage
     ) internal returns (bytes memory) {
-        require(
-            address(this).balance >= value,
-            "Address: insufficient balance for call"
-        );
+        require(address(this).balance >= value, "Address: insufficient balance for call");
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) =
-            target.call{value: value}(data);
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -683,17 +629,8 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data)
-        internal
-        view
-        returns (bytes memory)
-    {
-        return
-            functionStaticCall(
-                target,
-                data,
-                "Address: low-level static call failed"
-            );
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
     }
 
     /**
@@ -720,16 +657,8 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
-        return
-            functionDelegateCall(
-                target,
-                data,
-                "Address: low-level delegate call failed"
-            );
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
     }
 
     /**
@@ -796,10 +725,7 @@ library SafeBEP20 {
         address to,
         uint256 value
     ) internal {
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.transfer.selector, to, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
     function safeTransferFrom(
@@ -808,10 +734,7 @@ library SafeBEP20 {
         address to,
         uint256 value
     ) internal {
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.transferFrom.selector, from, to, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
     /**
@@ -834,10 +757,7 @@ library SafeBEP20 {
             (value == 0) || (token.allowance(address(this), spender) == 0),
             "SafeBEP20: approve from non-zero to non-zero allowance"
         );
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(token.approve.selector, spender, value)
-        );
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function safeIncreaseAllowance(
@@ -845,16 +765,8 @@ library SafeBEP20 {
         address spender,
         uint256 value
     ) internal {
-        uint256 newAllowance =
-            token.allowance(address(this), spender).add(value);
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(
-                token.approve.selector,
-                spender,
-                newAllowance
-            )
-        );
+        uint256 newAllowance = token.allowance(address(this), spender).add(value);
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
     function safeDecreaseAllowance(
@@ -863,18 +775,8 @@ library SafeBEP20 {
         uint256 value
     ) internal {
         uint256 newAllowance =
-            token.allowance(address(this), spender).sub(
-                value,
-                "SafeBEP20: decreased allowance below zero"
-            );
-        _callOptionalReturn(
-            token,
-            abi.encodeWithSelector(
-                token.approve.selector,
-                spender,
-                newAllowance
-            )
-        );
+            token.allowance(address(this), spender).sub(value, "SafeBEP20: decreased allowance below zero");
+        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
     /**
@@ -888,18 +790,11 @@ library SafeBEP20 {
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
 
-        bytes memory returndata =
-            address(token).functionCall(
-                data,
-                "SafeBEP20: low-level call failed"
-            );
+        bytes memory returndata = address(token).functionCall(data, "SafeBEP20: low-level call failed");
         if (returndata.length > 0) {
             // Return data is optional
             // solhint-disable-next-line max-line-length
-            require(
-                abi.decode(returndata, (bool)),
-                "SafeBEP20: BEP20 operation did not succeed"
-            );
+            require(abi.decode(returndata, (bool)), "SafeBEP20: BEP20 operation did not succeed");
         }
     }
 }
@@ -907,6 +802,7 @@ library SafeBEP20 {
 // File: contracts/RiyokuPoolInitializable.sol
 
 pragma solidity 0.6.12;
+
 contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
@@ -940,12 +836,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
     // The fee address
     address public feeAddress;
-
-    // Total staked supply
-    uint256 public totalStakedSupply;
-
-    // Staked token is same as reward token or not
-    bool public stakeSameReward;
 
     // The token tax rate
     uint16 public tokenTaxRate;
@@ -1022,9 +912,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
         stakedToken = _stakedToken;
         rewardToken = _rewardToken;
-        if (address(_stakedToken) == address(_rewardToken)) {
-            stakeSameReward = true;
-        }
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
         bonusEndBlock = _bonusEndBlock;
@@ -1073,7 +960,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                     user.rewardDebt
                 );
             if (pending > 0) {
-                require(availableRewardTokens() > pending, "Insufficient reward tokens");
                 rewardToken.safeTransfer(address(msg.sender), pending);
             }
         }
@@ -1093,11 +979,10 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                 if (fee > 0) {
                     stakedToken.safeTransfer(feeAddress, fee);
                 }
-                realAmount = realAmount.sub(fee);
+                user.amount = user.amount.add(realAmount).sub(fee);
+            } else {
+                user.amount = user.amount.add(realAmount);
             }
-
-            user.amount = user.amount.add(realAmount);
-            totalStakedSupply = totalStakedSupply.add(realAmount);
         }
 
         user.rewardDebt = user.amount.mul(accTokenPerShare).div(
@@ -1113,7 +998,7 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 _amount) external nonReentrant {
         UserInfo storage user = userInfo[msg.sender];
-        require(user.amount >= _amount && totalStakedSupply >= _amount, "Amount to withdraw too high");
+        require(user.amount >= _amount, "Amount to withdraw too high");
 
         _updatePool();
 
@@ -1122,14 +1007,18 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                 user.rewardDebt
             );
 
-        if (_amount > 0 && user.amount > 0) {
-            user.amount = user.amount.sub(_amount);
-            totalStakedSupply = totalStakedSupply.sub(_amount);
-            stakedToken.safeTransfer(address(msg.sender), _amount);
+        if (_amount > 0) {
+            uint256 realAmount = _amount;
+
+            if (user.amount < realAmount) {
+                realAmount = user.amount;
+            }
+
+            user.amount = user.amount.sub(realAmount);
+            stakedToken.safeTransfer(address(msg.sender), realAmount);
         }
 
         if (pending > 0) {
-            require(availableRewardTokens() > pending, "Insufficient reward tokens");
             rewardToken.safeTransfer(address(msg.sender), pending);
         }
 
@@ -1152,12 +1041,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
         if (amountToTransfer > 0) {
             stakedToken.safeTransfer(address(msg.sender), amountToTransfer);
-            if (totalStakedSupply > amountToTransfer) {
-                totalStakedSupply = totalStakedSupply.sub(amountToTransfer);
-            } else {
-                totalStakedSupply = 0;
-            }
-            
         }
 
         emit EmergencyWithdraw(msg.sender, user.amount);
@@ -1168,7 +1051,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      * @dev Only callable by owner. Needs to be for emergency.
      */
     function emergencyRewardWithdraw(uint256 _amount) external onlyOwner {
-        require(availableRewardTokens() > _amount, "Insufficient reward tokens");
         rewardToken.safeTransfer(address(msg.sender), _amount);
     }
 
@@ -1202,22 +1084,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function stopReward() external onlyOwner {
         bonusEndBlock = block.number;
-    }
-
-    /**
-     * @notice Available reward token amount
-     */
-    function availableRewardTokens() public view returns (uint256) {
-        if (stakeSameReward == true) {
-            uint256 totalTokenAmount = rewardToken.balanceOf(address(this));
-            if (totalTokenAmount < totalStakedSupply) {
-                return 0;
-            } else {
-                return totalTokenAmount.sub(totalStakedSupply);
-            }
-        } else {
-            return rewardToken.balanceOf(address(this));
-        }
     }
 
     /*
@@ -1324,13 +1190,13 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function pendingReward(address _user) external view returns (uint256) {
         UserInfo storage user = userInfo[_user];
-                
-        if (block.number > lastRewardBlock && totalStakedSupply != 0) {
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+        if (block.number > lastRewardBlock && stakedTokenSupply != 0) {
             uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
             uint256 cakeReward = multiplier.mul(rewardPerBlock);
             uint256 adjustedTokenPerShare =
                 accTokenPerShare.add(
-                    cakeReward.mul(PRECISION_FACTOR).div(totalStakedSupply)
+                    cakeReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
                 );
             return
                 user
@@ -1354,7 +1220,9 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
             return;
         }
 
-        if (totalStakedSupply == 0) {
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+
+        if (stakedTokenSupply == 0) {
             lastRewardBlock = block.number;
             return;
         }
@@ -1362,7 +1230,7 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
         uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
         uint256 cakeReward = multiplier.mul(rewardPerBlock);
         accTokenPerShare = accTokenPerShare.add(
-            cakeReward.mul(PRECISION_FACTOR).div(totalStakedSupply)
+            cakeReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
         );
         lastRewardBlock = block.number;
     }
@@ -1384,84 +1252,5 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
         } else {
             return bonusEndBlock.sub(_from);
         }
-    }
-}
-
-
-// File: contracts/RiyokuPoolFactory.sol
-
-pragma solidity 0.6.12;
-
-contract RiyokuPoolFactory is Ownable {
-    event NewRiyokuPoolContract(address indexed smartChef);
-
-    uint16 public constant MAX_DEPOSIT_FEE = 2000;
-    uint16 public constant MAX_TOKEN_TAX_RATE = 2000;
-
-    constructor() public {
-        //
-    }
-
-    /*
-     * @notice Deploy the pool
-     * @param _stakedToken: staked token address
-     * @param _rewardToken: reward token address
-     * @param _rewardPerBlock: reward per block (in rewardToken)
-     * @param _startBlock: start block
-     * @param _endBlock: end block
-     * @param _tokenTaxRate: token tax rate
-     * @param _depositFee: deposit fee
-     * @param _poolLimitPerUser: pool limit per user in stakedToken (if any, else 0)
-     * @param _admin: admin address with ownership
-     * @return address of new smart chef contract
-     */
-    function deployPool(
-        IBEP20 _stakedToken,
-        IBEP20 _rewardToken,
-        uint256 _rewardPerBlock,
-        uint256 _startBlock,
-        uint256 _bonusEndBlock,
-        uint256 _poolLimitPerUser,
-        uint16 _tokenTaxRate,
-        uint16 _depositFee,
-        address _feeAddress,
-        address _admin
-    ) external onlyOwner {
-        require(_stakedToken.totalSupply() >= 0);
-        require(_rewardToken.totalSupply() >= 0);
-
-        require(_tokenTaxRate < MAX_TOKEN_TAX_RATE, "Invalid token tax rate");
-        require(_depositFee < MAX_DEPOSIT_FEE, "Invalid deposit fee value");
-
-        bytes memory bytecode = type(RiyokuPoolInitializable).creationCode;
-        bytes32 salt =
-            keccak256(
-                abi.encodePacked(_stakedToken, _rewardToken, _startBlock)
-            );
-        address smartChefAddress;
-
-        assembly {
-            smartChefAddress := create2(
-                0,
-                add(bytecode, 32),
-                mload(bytecode),
-                salt
-            )
-        }
-
-        RiyokuPoolInitializable(smartChefAddress).initialize(
-            _stakedToken,
-            _rewardToken,
-            _rewardPerBlock,
-            _startBlock,
-            _bonusEndBlock,
-            _poolLimitPerUser,
-            _tokenTaxRate,
-            _depositFee,
-            _feeAddress,
-            _admin
-        );
-
-        emit NewRiyokuPoolContract(smartChefAddress);
     }
 }

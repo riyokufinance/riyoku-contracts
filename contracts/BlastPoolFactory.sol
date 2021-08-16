@@ -907,6 +907,7 @@ library SafeBEP20 {
 // File: contracts/RiyokuPoolInitializable.sol
 
 pragma solidity 0.6.12;
+
 contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
@@ -940,12 +941,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
     // The fee address
     address public feeAddress;
-
-    // Total staked supply
-    uint256 public totalStakedSupply;
-
-    // Staked token is same as reward token or not
-    bool public stakeSameReward;
 
     // The token tax rate
     uint16 public tokenTaxRate;
@@ -1022,9 +1017,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
         stakedToken = _stakedToken;
         rewardToken = _rewardToken;
-        if (address(_stakedToken) == address(_rewardToken)) {
-            stakeSameReward = true;
-        }
         rewardPerBlock = _rewardPerBlock;
         startBlock = _startBlock;
         bonusEndBlock = _bonusEndBlock;
@@ -1073,7 +1065,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                     user.rewardDebt
                 );
             if (pending > 0) {
-                require(availableRewardTokens() > pending, "Insufficient reward tokens");
                 rewardToken.safeTransfer(address(msg.sender), pending);
             }
         }
@@ -1093,11 +1084,10 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                 if (fee > 0) {
                     stakedToken.safeTransfer(feeAddress, fee);
                 }
-                realAmount = realAmount.sub(fee);
+                user.amount = user.amount.add(realAmount).sub(fee);
+            } else {
+                user.amount = user.amount.add(realAmount);
             }
-
-            user.amount = user.amount.add(realAmount);
-            totalStakedSupply = totalStakedSupply.add(realAmount);
         }
 
         user.rewardDebt = user.amount.mul(accTokenPerShare).div(
@@ -1113,7 +1103,7 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function withdraw(uint256 _amount) external nonReentrant {
         UserInfo storage user = userInfo[msg.sender];
-        require(user.amount >= _amount && totalStakedSupply >= _amount, "Amount to withdraw too high");
+        require(user.amount >= _amount, "Amount to withdraw too high");
 
         _updatePool();
 
@@ -1122,14 +1112,18 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
                 user.rewardDebt
             );
 
-        if (_amount > 0 && user.amount > 0) {
-            user.amount = user.amount.sub(_amount);
-            totalStakedSupply = totalStakedSupply.sub(_amount);
-            stakedToken.safeTransfer(address(msg.sender), _amount);
+        if (_amount > 0) {
+            uint256 realAmount = _amount;
+
+            if (user.amount < realAmount) {
+                realAmount = user.amount;
+            }
+
+            user.amount = user.amount.sub(realAmount);
+            stakedToken.safeTransfer(address(msg.sender), realAmount);
         }
 
         if (pending > 0) {
-            require(availableRewardTokens() > pending, "Insufficient reward tokens");
             rewardToken.safeTransfer(address(msg.sender), pending);
         }
 
@@ -1152,12 +1146,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
 
         if (amountToTransfer > 0) {
             stakedToken.safeTransfer(address(msg.sender), amountToTransfer);
-            if (totalStakedSupply > amountToTransfer) {
-                totalStakedSupply = totalStakedSupply.sub(amountToTransfer);
-            } else {
-                totalStakedSupply = 0;
-            }
-            
         }
 
         emit EmergencyWithdraw(msg.sender, user.amount);
@@ -1168,7 +1156,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      * @dev Only callable by owner. Needs to be for emergency.
      */
     function emergencyRewardWithdraw(uint256 _amount) external onlyOwner {
-        require(availableRewardTokens() > _amount, "Insufficient reward tokens");
         rewardToken.safeTransfer(address(msg.sender), _amount);
     }
 
@@ -1202,22 +1189,6 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function stopReward() external onlyOwner {
         bonusEndBlock = block.number;
-    }
-
-    /**
-     * @notice Available reward token amount
-     */
-    function availableRewardTokens() public view returns (uint256) {
-        if (stakeSameReward == true) {
-            uint256 totalTokenAmount = rewardToken.balanceOf(address(this));
-            if (totalTokenAmount < totalStakedSupply) {
-                return 0;
-            } else {
-                return totalTokenAmount.sub(totalStakedSupply);
-            }
-        } else {
-            return rewardToken.balanceOf(address(this));
-        }
     }
 
     /*
@@ -1324,13 +1295,13 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
      */
     function pendingReward(address _user) external view returns (uint256) {
         UserInfo storage user = userInfo[_user];
-                
-        if (block.number > lastRewardBlock && totalStakedSupply != 0) {
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+        if (block.number > lastRewardBlock && stakedTokenSupply != 0) {
             uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
             uint256 cakeReward = multiplier.mul(rewardPerBlock);
             uint256 adjustedTokenPerShare =
                 accTokenPerShare.add(
-                    cakeReward.mul(PRECISION_FACTOR).div(totalStakedSupply)
+                    cakeReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
                 );
             return
                 user
@@ -1354,7 +1325,9 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
             return;
         }
 
-        if (totalStakedSupply == 0) {
+        uint256 stakedTokenSupply = stakedToken.balanceOf(address(this));
+
+        if (stakedTokenSupply == 0) {
             lastRewardBlock = block.number;
             return;
         }
@@ -1362,7 +1335,7 @@ contract RiyokuPoolInitializable is Ownable, ReentrancyGuard {
         uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
         uint256 cakeReward = multiplier.mul(rewardPerBlock);
         accTokenPerShare = accTokenPerShare.add(
-            cakeReward.mul(PRECISION_FACTOR).div(totalStakedSupply)
+            cakeReward.mul(PRECISION_FACTOR).div(stakedTokenSupply)
         );
         lastRewardBlock = block.number;
     }
